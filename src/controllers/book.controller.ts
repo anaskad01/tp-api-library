@@ -1,4 +1,4 @@
-import { Controller, Get, Route, Tags, Path, Post, Body} from "tsoa";
+import { Controller, Get, Route, Tags, Path, Post, Body, Delete} from "tsoa";
 import { BookDTO } from "../dto/book.dto";
 
 import { bookService } from "../services/book.service";
@@ -38,6 +38,18 @@ export class BookController extends Controller {
       isbn: book.isbn,
       author: book.author, 
     };
+  }
+
+
+  @Delete("{id}")
+  public async deleteBook(@Path() id: number): Promise<void> {
+    const book = await bookService.getBookById(id);
+
+    if (!book) {
+      throw { status: 404, message: `Aucun livre trouvé avec l'id: ${id}` };
+    }
+
+    await bookService.deleteBook(id);
   }
 }
 

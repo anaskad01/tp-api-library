@@ -16,31 +16,42 @@ export class BookService {
   }
 
 
-public async createBook(
-  title: string,
-  publishYear: number,
-  isbn: string,
-  authorId: number
-): Promise<Book> {
-  const author = await Author.findByPk(authorId);
-  if (!author) {
-    throw { status: 404, message: `Aucun auteur trouvé avec l'id: ${authorId}` };
+  public async createBook(
+    title: string,
+    publishYear: number,
+    isbn: string,
+    authorId: number
+  ): Promise<Book> {
+    const author = await Author.findByPk(authorId);
+    if (!author) {
+      throw { status: 404, message: `Aucun auteur trouvé avec l'id: ${authorId}` };
+    }
+
+    const book = await Book.create({
+      title: title,
+      publishYear: publishYear,
+      isbn: isbn,
+      authorId: authorId,
+    });
+
+    const createdBook = await Book.findByPk(book.id, {
+      include: [{ model: Author, as: "author" }],
+    });
+    if (!createdBook) {
+      throw { status: 500, message: "Erreur lors de la création du livre." };
+    }
+    return createdBook;
   }
 
-  const book = await Book.create({
-    title: title,
-    publishYear: publishYear,
-    isbn: isbn,
-    authorId: authorId,
-  });
 
-  const createdBook = await Book.findByPk(book.id, {
-    include: [{ model: Author, as: "author" }],
-  });
-  if (!createdBook) {
-    throw { status: 500, message: "Erreur lors de la création du livre." };
+  public async deleteBook(id: number): Promise<void> {
+  const book = await Book.findByPk(id);
+
+  if (!book) {
+    throw { status: 404, message: `Aucun livre trouvé avec l'id: ${id}` };
   }
-  return createdBook;
+
+  await book.destroy();
 }
 }
 
