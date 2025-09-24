@@ -38,12 +38,16 @@ export class AuthorController extends Controller {
   }
 
   // Met à jour un auteur par ID
-  @Patch("{id}")
-  public async updateAuthor(
-    @Path() id: number,
-    @Body() requestBody: AuthorDTO
-  ): Promise<AuthorDTO | null> {
-    const { firstName, lastName } = requestBody;
-    return authorService.updateAuthor(id, firstName, lastName);
+@Patch("{id}")
+public async updateAuthor(
+  @Path() id: number,
+  @Body() requestBody: AuthorDTO
+): Promise<AuthorDTO> {
+  const { firstName, lastName } = requestBody;
+  const updatedAuthor = await authorService.updateAuthor(id, firstName, lastName);
+  if (!updatedAuthor) {
+    throw { status: 404, message: `Pas d'utilisateur avec l'id: ${id}` };
   }
+  return updatedAuthor;
+}
 }
