@@ -7,13 +7,11 @@ export class AuthorService {
   }
 
   // Récupère un auteur par ID
- public async getAuthorById(id: number): Promise<Author> {
-  const author = await Author.findByPk(id);
-  if (!author) {
-    throw { status: 404, message: `Pas d'utilisateur avec l'id: ${id} ` };
+  public async getAuthorById(id: number): Promise<Author | null> {
+    return Author.findByPk(id);
   }
-  return author;
-}
+
+  
   // Crée un nouvel auteur
   public async createAuthor(
     firstName: string,

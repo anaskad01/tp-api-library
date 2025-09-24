@@ -15,7 +15,11 @@ export class AuthorController extends Controller {
   // Récupère un auteur par ID
   @Get("{id}")
   public async getAuthorById(@Path() id: number): Promise<AuthorDTO | null> {
-    return authorService.getAuthorById(id);
+    const author = await authorService.getAuthorById(id);
+      if (!author) {
+        throw { status: 404, message: `Pas d'utilisateur avec l'id: ${id} ` };
+      }
+    return author;
   }
 
   // Crée un nouvel auteur
