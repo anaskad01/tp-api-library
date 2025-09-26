@@ -28,13 +28,16 @@
   "license": "ISC",
   "dependencies": {
     "@tsoa/runtime": "^6.4.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcrypt": "^6.0.0",
     "express": "^4.21.0",
     "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "sequelize": "^6.37.3",
     "sqlite3": "^5.1.7",
     "swagger-ui-express": "^5.0.1",
-    "tsoa": "^6.4.0"
+    "tsoa": "^6.6.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

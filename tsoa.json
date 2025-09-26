@@ -3,11 +3,22 @@
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": ["src/controllers/*.ts"],
   "spec": {
-    "outputDirectory": "public",
-    "specVersion": 3
+    "outputDirectory": "build",
+    "specVersion": 3,
+    "securityDefinitions": {
+      "jwt": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "security": [
+      {
+        "jwt": []
+      }
+    ]
   },
   "routes": {
-    "routesDir": "src/routes",
-    "routesFileName": "index.ts"
+    "routesDir": "src/routes"
   }
 }
