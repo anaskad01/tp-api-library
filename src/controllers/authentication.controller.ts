@@ -10,13 +10,14 @@ export class AuthenticationController extends Controller {
     public async authenticate(@Body() requestBody: AuthenticationDTO) {
         const { grant_type, username, password } = requestBody;
 
-        if (grant_type !== "password") {
+        if(grant_type !== "password") {
             let error: CustomError = new Error("Unsupported grant_type");
             error.status = 400;
             throw error;
         }
 
         const token = await authenticationService.authenticate(username, password);
+    
         return { token };
     }
 }

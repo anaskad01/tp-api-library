@@ -1,68 +1,88 @@
-import {BookCopy} from "../models/bookCopy.model";
-import {Book} from "../models/book.model";
-import {BookDTO} from "../dto/book.dto";
+import { BookCopyStatus } from "../dto/bookCopy.dto";
+import { CustomError } from "../middlewares/errorHandler";
+import { Author } from "../models/author.model";
+import { Book } from "../models/book.model";
+import { BookCopy } from "../models/bookCopy.model";
+import { BookService } from "./book.service";
 
 export class BookCopyService {
-    public async getAllBookCopys(): Promise<BookCopy[]> {
-        return BookCopy.findAll({
-            include: [{
-                model: Book,
-                as: 'book'
-            }]
-        });
-    }
 
-    // Récupère une copie de livre par ID
-    public async getBookCopyById(id: number): Promise<BookCopy | null> {
-        return BookCopy.findByPk(id);
-    }
+   readonly include =  {
+    include: [
+      {
+        model: Book,
+        as: "book",
+        include: [
+          {
+            model: Author,
+            as: "author",
+          },
+        ],
+      },
+    ],
+  };
+  public bookService = new BookService();
 
-    // Récupère une ou plusieurs copie(s) de livre par l'ID d'un livre
-    public async getBookCopysByBookId(id: number): Promise<BookCopy[] | null> {
-        return BookCopy.findAll({where: {bookId: id}});
-    }
+  public async getAllBookCopies(): Promise<BookCopy[]> {
+    return BookCopy.findAll(this.include);
+  }
 
-    // Crée une nouvelle copie de livre
-    public async createBookCopy(
-        available: number,
-        state: number,
-        book: BookDTO | undefined,
-    ): Promise<BookCopy> {
-        return BookCopy.create({
-            bookId: book?.id,
-            available: available,
-            state: state,
-            book: book
-        });
-    }
+  public async getBookCopyById(id: number): Promise<BookCopy | null> {
+    return BookCopy.findByPk(id, this.include);
+  }
 
-    // Met à jour une copie de livre
-    public async updateBookCopy(
-        id: number,
-        bookId?: number,
-        available?: number,
-        state?: number,
-        book?: Book,
-    ): Promise<BookCopy | null> {
-        const bookCopy = await BookCopy.findByPk(id);
-        if (bookCopy) {
-            if (bookId) bookCopy.bookId = bookId;
-            if (available) bookCopy.available = available;
-            if (state) bookCopy.state = state;
-            if (book) bookCopy.book = book;
-            await bookCopy.save();
-            return bookCopy;
+  public async createBookCopy(
+    bookId: number,
+    available: boolean,
+    state: BookCopyStatus
+  ): Promise<BookCopy> {
+    let book: Book | null = await this.bookService.getBookById(
+      bookId
+    );
+    if (book === null) {
+      let error: CustomError = new Error(`Book ${bookId} not found`);
+      error.status = 404;
+      throw error;
+    }
+    return BookCopy.create({ bookId, available, state });
+  }
+
+  public async updateBookCopy(
+    id: number,
+    bookId?: number,
+    available?: boolean,
+    state?: BookCopyStatus
+  ): Promise<BookCopy> {
+    let bookCopy = await this.getBookCopyById(id);
+    if (bookCopy === null) {
+      let error: CustomError = new Error(`BookCopy ${id} not found`);
+      error.status = 404;
+      throw error;
+    } else {
+      if (bookId !== undefined) {
+        let book = await this.bookService.getBookById(bookId);
+        if (book === null) {
+          let error: CustomError = new Error(`Book ${bookId} not found`);
+          error.status = 404;
+          throw error;
         }
-        return null;
-    }
+      }
 
-    // Supprime une copie de livre par ID
-    public async deleteBookCopy(id: number): Promise<void> {
-        const bookCopy = await BookCopy.findByPk(id);
-        if (bookCopy) {
-            await bookCopy.destroy();
-        }
+      if (available !== undefined) {
+        bookCopy.available = available;
+      }
+
+      if (state !== undefined) {
+        bookCopy.state = state;
+      }
+
+      return bookCopy.save();
     }
+  }
+
+  public async deleteBookCopy(id: number): Promise<void> {
+    await BookCopy.destroy({ where: { id } });
+  }
 }
 
 export const bookCopyService = new BookCopyService();

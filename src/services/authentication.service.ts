@@ -12,8 +12,16 @@ export class AuthenticationService {
             throw error;
         }
 
+        const userRole = user.getDataValue('role');
+        const userName = user.getDataValue('username');
+        
+        console.log("User found:", { username: userName, role: userRole });
+
         const token = jwt.sign(
-            {username: user.username}, 
+            {
+                username: userName, 
+                role: userRole
+            }, 
             "your_secret_key",
             { expiresIn: '1h' });
         return token;

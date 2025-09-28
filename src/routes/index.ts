@@ -11,19 +11,38 @@ import { BookController } from './../controllers/book.controller';
 import { AuthorController } from './../controllers/author.controller';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { AuthenticationController } from './../controllers/authentication.controller';
+import { expressAuthentication } from './../middlewares/authentication';
+// @ts-ignore - no great way to install types from subpackage
 import type { Request as ExRequest, Response as ExResponse, RequestHandler, Router } from 'express';
 
+const expressAuthenticationRecasted = expressAuthentication as (req: ExRequest, securityName: string, scopes?: string[], res?: ExResponse) => Promise<any>;
 
 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "BookCopyStatus": {
+        "dataType": "refEnum",
+        "enums": [0,1,2,3,4,5],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "BookCopyDTO": {
+        "dataType": "refObject",
+        "properties": {
+            "id": {"dataType":"double"},
+            "bookId": {"dataType":"double","required":true},
+            "available": {"dataType":"boolean","required":true},
+            "state": {"ref":"BookCopyStatus","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "AuthorDTO": {
         "dataType": "refObject",
         "properties": {
             "id": {"dataType":"double"},
-            "firstName": {"dataType":"string","required":true},
-            "lastName": {"dataType":"string","required":true},
+            "firstName": {"dataType":"string"},
+            "lastName": {"dataType":"string"},
         },
         "additionalProperties": false,
     },
@@ -36,18 +55,6 @@ const models: TsoaRoute.Models = {
             "publishYear": {"dataType":"double","required":true},
             "author": {"ref":"AuthorDTO"},
             "isbn": {"dataType":"string","required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "BookCopyDTO": {
-        "dataType": "refObject",
-        "properties": {
-            "id": {"dataType":"double"},
-            "bookId": {"dataType":"double","required":true},
-            "available": {"dataType":"double","required":true},
-            "state": {"dataType":"double","required":true},
-            "book": {"ref":"BookDTO"},
         },
         "additionalProperties": false,
     },
@@ -79,24 +86,25 @@ export function RegisterRoutes(app: Router) {
 
 
     
-        const argsBookCopyController_getAllBookCopys: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsBookCopyController_getAllBookCopies: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/book-copies',
+            authenticateMiddleware([{"jwt":["bookCopy:read"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController)),
-            ...(fetchMiddlewares<RequestHandler>(BookCopyController.prototype.getAllBookCopys)),
+            ...(fetchMiddlewares<RequestHandler>(BookCopyController.prototype.getAllBookCopies)),
 
-            async function BookCopyController_getAllBookCopys(request: ExRequest, response: ExResponse, next: any) {
+            async function BookCopyController_getAllBookCopies(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsBookCopyController_getAllBookCopys, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsBookCopyController_getAllBookCopies, request, response });
 
                 const controller = new BookCopyController();
 
               await templateService.apiHandler({
-                methodName: 'getAllBookCopys',
+                methodName: 'getAllBookCopies',
                 controller,
                 response,
                 next,
@@ -112,6 +120,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.get('/book-copies/:id',
+            authenticateMiddleware([{"jwt":["bookCopy:read"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController)),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController.prototype.getBookCopyById)),
 
@@ -142,6 +151,7 @@ export function RegisterRoutes(app: Router) {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"BookCopyDTO"},
         };
         app.post('/book-copies',
+            authenticateMiddleware([{"jwt":["bookCopy:create"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController)),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController.prototype.createBookCopy)),
 
@@ -173,6 +183,7 @@ export function RegisterRoutes(app: Router) {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"BookCopyDTO"},
         };
         app.patch('/book-copies/:id',
+            authenticateMiddleware([{"jwt":["bookCopy:update"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController)),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController.prototype.updateBookCopy)),
 
@@ -203,6 +214,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.delete('/book-copies/:id',
+            authenticateMiddleware([{"jwt":["bookCopy:delete"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController)),
             ...(fetchMiddlewares<RequestHandler>(BookCopyController.prototype.deleteBookCopy)),
 
@@ -232,6 +244,7 @@ export function RegisterRoutes(app: Router) {
         const argsBookController_getAllBooks: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/books',
+            authenticateMiddleware([{"jwt":["book:read"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookController)),
             ...(fetchMiddlewares<RequestHandler>(BookController.prototype.getAllBooks)),
 
@@ -258,25 +271,26 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsBookController_getBookById: Record<string, TsoaRoute.ParameterSchema> = {
+        const argsBookController_getBoodById: Record<string, TsoaRoute.ParameterSchema> = {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.get('/books/:id',
+            authenticateMiddleware([{"jwt":["book:read"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookController)),
-            ...(fetchMiddlewares<RequestHandler>(BookController.prototype.getBookById)),
+            ...(fetchMiddlewares<RequestHandler>(BookController.prototype.getBoodById)),
 
-            async function BookController_getBookById(request: ExRequest, response: ExResponse, next: any) {
+            async function BookController_getBoodById(request: ExRequest, response: ExResponse, next: any) {
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsBookController_getBookById, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsBookController_getBoodById, request, response });
 
                 const controller = new BookController();
 
               await templateService.apiHandler({
-                methodName: 'getBookById',
+                methodName: 'getBoodById',
                 controller,
                 response,
                 next,
@@ -292,6 +306,7 @@ export function RegisterRoutes(app: Router) {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"BookDTO"},
         };
         app.post('/books',
+            authenticateMiddleware([{"jwt":["book:create"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookController)),
             ...(fetchMiddlewares<RequestHandler>(BookController.prototype.createBook)),
 
@@ -323,6 +338,7 @@ export function RegisterRoutes(app: Router) {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"BookDTO"},
         };
         app.patch('/books/:id',
+            authenticateMiddleware([{"jwt":["book:update"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookController)),
             ...(fetchMiddlewares<RequestHandler>(BookController.prototype.updateBook)),
 
@@ -353,6 +369,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.delete('/books/:id',
+            authenticateMiddleware([{"jwt":["book:delete"]}]),
             ...(fetchMiddlewares<RequestHandler>(BookController)),
             ...(fetchMiddlewares<RequestHandler>(BookController.prototype.deleteBook)),
 
@@ -379,39 +396,10 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsBookController_getBookBookCopysById: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
-        };
-        app.get('/books/:id/bookCopys',
-            ...(fetchMiddlewares<RequestHandler>(BookController)),
-            ...(fetchMiddlewares<RequestHandler>(BookController.prototype.getBookBookCopysById)),
-
-            async function BookController_getBookBookCopysById(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsBookController_getBookBookCopysById, request, response });
-
-                const controller = new BookController();
-
-              await templateService.apiHandler({
-                methodName: 'getBookBookCopysById',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         const argsAuthorController_getAllAuthors: Record<string, TsoaRoute.ParameterSchema> = {
         };
         app.get('/authors',
+            authenticateMiddleware([{"jwt":["author:read"]}]),
             ...(fetchMiddlewares<RequestHandler>(AuthorController)),
             ...(fetchMiddlewares<RequestHandler>(AuthorController.prototype.getAllAuthors)),
 
@@ -442,6 +430,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.get('/authors/:id',
+            authenticateMiddleware([{"jwt":["author:read"]}]),
             ...(fetchMiddlewares<RequestHandler>(AuthorController)),
             ...(fetchMiddlewares<RequestHandler>(AuthorController.prototype.getAuthorById)),
 
@@ -472,6 +461,7 @@ export function RegisterRoutes(app: Router) {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"AuthorDTO"},
         };
         app.post('/authors',
+            authenticateMiddleware([{"jwt":["author:create"]}]),
             ...(fetchMiddlewares<RequestHandler>(AuthorController)),
             ...(fetchMiddlewares<RequestHandler>(AuthorController.prototype.createAuthor)),
 
@@ -502,6 +492,7 @@ export function RegisterRoutes(app: Router) {
                 id: {"in":"path","name":"id","required":true,"dataType":"double"},
         };
         app.delete('/authors/:id',
+            authenticateMiddleware([{"jwt":["author:delete"]}]),
             ...(fetchMiddlewares<RequestHandler>(AuthorController)),
             ...(fetchMiddlewares<RequestHandler>(AuthorController.prototype.deleteAuthor)),
 
@@ -533,6 +524,7 @@ export function RegisterRoutes(app: Router) {
                 requestBody: {"in":"body","name":"requestBody","required":true,"ref":"AuthorDTO"},
         };
         app.patch('/authors/:id',
+            authenticateMiddleware([{"jwt":["author:update"]}]),
             ...(fetchMiddlewares<RequestHandler>(AuthorController)),
             ...(fetchMiddlewares<RequestHandler>(AuthorController.prototype.updateAuthor)),
 
@@ -548,36 +540,6 @@ export function RegisterRoutes(app: Router) {
 
               await templateService.apiHandler({
                 methodName: 'updateAuthor',
-                controller,
-                response,
-                next,
-                validatedArgs,
-                successStatus: undefined,
-              });
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        const argsAuthorController_getAuthorBooksById: Record<string, TsoaRoute.ParameterSchema> = {
-                id: {"in":"path","name":"id","required":true,"dataType":"double"},
-        };
-        app.get('/authors/:id/books',
-            ...(fetchMiddlewares<RequestHandler>(AuthorController)),
-            ...(fetchMiddlewares<RequestHandler>(AuthorController.prototype.getAuthorBooksById)),
-
-            async function AuthorController_getAuthorBooksById(request: ExRequest, response: ExResponse, next: any) {
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsAuthorController_getAuthorBooksById, request, response });
-
-                const controller = new AuthorController();
-
-              await templateService.apiHandler({
-                methodName: 'getAuthorBooksById',
                 controller,
                 response,
                 next,
@@ -622,6 +584,76 @@ export function RegisterRoutes(app: Router) {
 
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
+
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+    function authenticateMiddleware(security: TsoaRoute.Security[] = []) {
+        return async function runAuthenticationMiddleware(request: any, response: any, next: any) {
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            // keep track of failed auth attempts so we can hand back the most
+            // recent one.  This behavior was previously existing so preserving it
+            // here
+            const failedAttempts: any[] = [];
+            const pushAndRethrow = (error: any) => {
+                failedAttempts.push(error);
+                throw error;
+            };
+
+            const secMethodOrPromises: Promise<any>[] = [];
+            for (const secMethod of security) {
+                if (Object.keys(secMethod).length > 1) {
+                    const secMethodAndPromises: Promise<any>[] = [];
+
+                    for (const name in secMethod) {
+                        secMethodAndPromises.push(
+                            expressAuthenticationRecasted(request, name, secMethod[name], response)
+                                .catch(pushAndRethrow)
+                        );
+                    }
+
+                    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+                    secMethodOrPromises.push(Promise.all(secMethodAndPromises)
+                        .then(users => { return users[0]; }));
+                } else {
+                    for (const name in secMethod) {
+                        secMethodOrPromises.push(
+                            expressAuthenticationRecasted(request, name, secMethod[name], response)
+                                .catch(pushAndRethrow)
+                        );
+                    }
+                }
+            }
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            try {
+                request['user'] = await Promise.any(secMethodOrPromises);
+
+                // Response was sent in middleware, abort
+                if (response.writableEnded) {
+                    return;
+                }
+
+                next();
+            }
+            catch(err) {
+                // Show most recent error as response
+                const error = failedAttempts.pop();
+                error.status = error.status || 401;
+
+                // Response was sent in middleware, abort
+                if (response.writableEnded) {
+                    return;
+                }
+                next(error);
+            }
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        }
+    }
 
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 }

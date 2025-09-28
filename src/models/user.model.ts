@@ -1,17 +1,26 @@
 import { Model, DataTypes } from "sequelize";
-import sequelize from "../config/database"; // Connexion à la base de données
+import sequelize from "../config/database"; 
 export interface UserAttributes {
   id?: number;
   username: string;
   password: string;
-  role: string; // Ajout du champ "role"
+  role: string;
 }
 
 export class User extends Model<UserAttributes> implements UserAttributes {
   public id!: number;
   public username!: string;
   public password!: string;
-  public role!: string; // Ajout du champ "role"
+  public role!: string;
+
+  public toJSON(): UserAttributes {
+    return {
+      id: this.getDataValue('id'),
+      username: this.getDataValue('username'),
+      password: this.getDataValue('password'),
+      role: this.getDataValue('role')
+    };
+  }
 }
 
 User.init(
@@ -24,7 +33,6 @@ User.init(
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     password: {
       type: DataTypes.STRING,
@@ -33,29 +41,11 @@ User.init(
     role: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: "utilisateur",
     },
   },
   {
     sequelize,
-    tableName: "Users",
+    tableName: "User",
   }
 );
-
-// Synchronisation de la base de données
-(async () => {
-  await sequelize.sync({ alter: true });
-
-  const users = [
-    { username: "admin", password: "admin123", role: "admin" },
-    { username: "gerant", password: "gerant123", role: "gerant" },
-    { username: "utilisateur", password: "user123", role: "utilisateur" },
-  ];
-
-  for (const user of users) {
-    const existingUser = await User.findOne({ where: { username: user.username } });
-    if (!existingUser) {
-      await User.create(user);
-      console.log(`Utilisateur créé : ${user.username} avec le rôle ${user.role}`);
-    }
-  }
-})();

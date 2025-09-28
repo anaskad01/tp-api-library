@@ -7,6 +7,42 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"BookCopyStatus": {
+				"enum": [
+					0,
+					1,
+					2,
+					3,
+					4,
+					5
+				],
+				"type": "number"
+			},
+			"BookCopyDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"bookId": {
+						"type": "number",
+						"format": "double"
+					},
+					"available": {
+						"type": "boolean"
+					},
+					"state": {
+						"$ref": "#/components/schemas/BookCopyStatus"
+					}
+				},
+				"required": [
+					"bookId",
+					"available",
+					"state"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"AuthorDTO": {
 				"properties": {
 					"id": {
@@ -20,10 +56,6 @@
 						"type": "string"
 					}
 				},
-				"required": [
-					"firstName",
-					"lastName"
-				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -55,36 +87,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"BookCopyDTO": {
-				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
-					"bookId": {
-						"type": "number",
-						"format": "double"
-					},
-					"available": {
-						"type": "number",
-						"format": "double"
-					},
-					"state": {
-						"type": "number",
-						"format": "double"
-					},
-					"book": {
-						"$ref": "#/components/schemas/BookDTO"
-					}
-				},
-				"required": [
-					"bookId",
-					"available",
-					"state"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"AuthenticationDTO": {
 				"properties": {
 					"grant_type": {
@@ -106,7 +108,13 @@
 				"additionalProperties": false
 			}
 		},
-		"securitySchemes": {}
+		"securitySchemes": {
+			"jwt": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "Authorization"
+			}
+		}
 	},
 	"info": {
 		"title": "express-typescript",
@@ -119,7 +127,7 @@
 	"paths": {
 		"/book-copies": {
 			"get": {
-				"operationId": "GetAllBookCopys",
+				"operationId": "GetAllBookCopies",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -136,9 +144,15 @@
 					}
 				},
 				"tags": [
-					"Book-copies"
+					"BookCopys"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"bookCopy:read"
+						]
+					}
+				],
 				"parameters": []
 			},
 			"post": {
@@ -156,9 +170,15 @@
 					}
 				},
 				"tags": [
-					"Book-copies"
+					"BookCopys"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"bookCopy:create"
+						]
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"required": true,
@@ -181,21 +201,22 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/BookCopyDTO"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/BookCopyDTO"
 								}
 							}
 						}
 					}
 				},
 				"tags": [
-					"Book-copies"
+					"BookCopys"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"bookCopy:read"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -216,21 +237,22 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/BookCopyDTO"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/BookCopyDTO"
 								}
 							}
 						}
 					}
 				},
 				"tags": [
-					"Book-copies"
+					"BookCopys"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"bookCopy:update"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -261,9 +283,15 @@
 					}
 				},
 				"tags": [
-					"Book-copies"
+					"BookCopys"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"bookCopy:delete"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -298,7 +326,13 @@
 				"tags": [
 					"Books"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"book:read"
+						]
+					}
+				],
 				"parameters": []
 			},
 			"post": {
@@ -318,7 +352,13 @@
 				"tags": [
 					"Books"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"book:create"
+						]
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"required": true,
@@ -334,19 +374,14 @@
 		},
 		"/books/{id}": {
 			"get": {
-				"operationId": "GetBookById",
+				"operationId": "GetBoodById",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/BookDTO"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/BookDTO"
 								}
 							}
 						}
@@ -355,7 +390,13 @@
 				"tags": [
 					"Books"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"book:read"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -376,12 +417,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/BookDTO"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/BookDTO"
 								}
 							}
 						}
@@ -390,7 +426,13 @@
 				"tags": [
 					"Books"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"book:update"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -423,43 +465,13 @@
 				"tags": [
 					"Books"
 				],
-				"security": [],
-				"parameters": [
+				"security": [
 					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
+						"jwt": [
+							"book:delete"
+						]
 					}
-				]
-			}
-		},
-		"/books/{id}/bookCopys": {
-			"get": {
-				"operationId": "GetBookBookCopysById",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/BookCopyDTO"
-									},
-									"type": "array",
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Books"
 				],
-				"security": [],
 				"parameters": [
 					{
 						"in": "path",
@@ -494,7 +506,13 @@
 				"tags": [
 					"Authors"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"author:read"
+						]
+					}
+				],
 				"parameters": []
 			},
 			"post": {
@@ -514,7 +532,13 @@
 				"tags": [
 					"Authors"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"author:create"
+						]
+					}
+				],
 				"parameters": [],
 				"requestBody": {
 					"required": true,
@@ -537,12 +561,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/AuthorDTO"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/AuthorDTO"
 								}
 							}
 						}
@@ -551,7 +570,13 @@
 				"tags": [
 					"Authors"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"author:read"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -574,7 +599,13 @@
 				"tags": [
 					"Authors"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"author:delete"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -595,12 +626,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/AuthorDTO"
-										}
-									],
-									"nullable": true
+									"$ref": "#/components/schemas/AuthorDTO"
 								}
 							}
 						}
@@ -609,7 +635,13 @@
 				"tags": [
 					"Authors"
 				],
-				"security": [],
+				"security": [
+					{
+						"jwt": [
+							"author:update"
+						]
+					}
+				],
 				"parameters": [
 					{
 						"in": "path",
@@ -631,42 +663,6 @@
 						}
 					}
 				}
-			}
-		},
-		"/authors/{id}/books": {
-			"get": {
-				"operationId": "GetAuthorBooksById",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/BookDTO"
-									},
-									"type": "array",
-									"nullable": true
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Authors"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
 			}
 		},
 		"/auth": {

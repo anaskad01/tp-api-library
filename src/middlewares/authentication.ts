@@ -1,8 +1,6 @@
 import * as express from "express";
 import * as jwt from "jsonwebtoken";
-
-let adminRight = [];
-let userRight = [];
+import { checkPermission } from "./roleMiddleware";
 
 export function expressAuthentication(
     request: express.Request,
@@ -16,15 +14,28 @@ export function expressAuthentication(
             if (!token) {
                 reject(new Error("No token provided"));
             } else {
+                jwt.verify(token, "your_secret_key", 
+                    function(erreur: any, decoded: any) {
+                        if (erreur) {
+                            reject(new Error("Invalid token"));
+                            return;
+                        }
 
-            jwt.verify(token, "your_secret_key", 
-                function(erreur, decoded) {
-                    if(scopes !== undefined) {
+                        if (scopes !== undefined && scopes.length > 0) {
+                            const userRole = decoded.role;
+                            
+                            for (const scope of scopes) {
+                                const [resource, action] = scope.split(':');
+                                
+                                if (!checkPermission(userRole, resource as any, action as any)) {
+                                    reject(new Error(`Insufficient permissions: ${scope}`));
+                                    return;
+                                }
+                            }
+                        }
                         
+                        resolve(decoded);
                     }
-                    resolve(decoded);
-                }
-
                 );
             }
         });
@@ -32,3 +43,4 @@ export function expressAuthentication(
         throw new Error("Only support JWT authentication");
     }
 }
+

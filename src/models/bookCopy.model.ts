@@ -1,54 +1,52 @@
-import {Model, DataTypes} from "sequelize";
-import sequelize from "../config/database"; // Connection à la base de données
-import {BookDTO} from "../dto/book.dto";
-import {Book} from "./book.model";
+import { Model } from "sequelize";
+import sequelize from "../config/database"; 
+import { Book } from "./book.model";
 
 export interface BookCopyAttributes {
-    id?: number;
-    bookId?: number;
-    available: number;
-    state: number;
-    book?: BookDTO;
+  id?: number;
+  bookId: number;
+  available: boolean;
+  state: number;
 }
 
-export class BookCopy extends Model<BookCopyAttributes> implements BookCopyAttributes {
-    public id?: number;
-    public bookId!: number;
-    public available!: number;
-    public state!: number;
-    public book?: BookDTO;
+export class BookCopy
+  extends Model<BookCopyAttributes>
+  implements BookCopyAttributes
+{
+  public id?: number;
+  public bookId!: number;
+  public available!: boolean;
+  public state!: number;
 }
 
 BookCopy.init(
-    {
-        id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true,
-        },
-        bookId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            field: "book_id",
-        },
-        available: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        state: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
+  {
+    id: {
+      type: "INTEGER",
+      autoIncrement: true,
+      primaryKey: true,
     },
-    {
-        sequelize,
-        tableName: "BookCopy",
+    bookId: {
+      type: "INTEGER",
+      allowNull: false,
+      field: "book_id",
+    },
+    available: {
+      type: "BOOLEAN",
+      allowNull: false,
+      defaultValue: true
+    },
+    state: {
+      type: "INTEGER",
+      allowNull: false,
+      defaultValue: 5
     }
+  },
+  {
+    sequelize,
+    tableName: "BookCopy",
+  }
 );
 
-BookCopy.belongsTo(Book, { foreignKey: "bookId", as: "book" });
-Book.hasMany(BookCopy, {
-    foreignKey: "book_id",
-    as: "copys",
-    sourceKey: "id",
-})
+BookCopy.belongsTo(Book, { foreignKey: 'bookId', as: 'book' });
+Book.hasMany(BookCopy, { foreignKey: 'bookId', as: 'copies' });

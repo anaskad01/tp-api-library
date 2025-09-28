@@ -1,9 +1,14 @@
-import {BookDTO} from "./book.dto";
-
+export enum BookCopyStatus {
+    BROKE,
+    BAD,
+    NEUTRAL,
+    GOOD,
+    EXCELLENT,
+    NEW
+}
 export interface BookCopyDTO {
     id?: number;
     bookId: number;
-    available: number;
-    state: number;
-    book?: BookDTO;
+    available: boolean;
+    state: BookCopyStatus;
 }

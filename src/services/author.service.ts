@@ -1,74 +1,47 @@
-import {Author} from "../models/author.model";
-import {Book} from "../models/book.model";
-import {BookCopy} from "../models/bookCopy.model";
-import {CustomError} from "../middlewares/errorHandler";
+import { Author } from "../models/author.model";
 
 export class AuthorService {
-    readonly includeBooksBookCopys = {
-        include: [
-            {
-                model: Book,
-                as: 'books',
-                include: [
-                    {
-                        model: BookCopy,
-                        as: 'copys'
-                    }
-                ]
-            }
-        ]
-    }
+  public async getAllAuthors(): Promise<Author[]> {
+    return Author.findAll();
+  }
 
-    // Récupère tous les auteurs
-    public async getAllAuthors(): Promise<Author[]> {
-        return Author.findAll();
-    }
+  public async getAuthorById(id: number): Promise<Author | null> {
+    return Author.findByPk(id);
+  }
 
-    // Récupère un auteur par ID
-    public async getAuthorById(id: number): Promise<Author | null> {
-        return Author.findByPk(id);
-    }
+  public async createAuthor(
+    firstName: string,
+    lastName: string
+  ): Promise<Author> {
+    const newAuthor = await Author.create({
+      firstName: firstName, 
+      lastName: lastName 
+    });
+    
+    return await Author.findByPk(newAuthor.id) || newAuthor;
+  }
 
-    // Crée un nouvel auteur
-    public async createAuthor(
-        firstName: string,
-        lastName: string
-    ): Promise<Author> {
-        return Author.create({firstName: firstName, lastName: lastName});
+  public async deleteAuthor(id: number): Promise<void> {
+    const author = await Author.findByPk(id);
+    if (author) {
+      await author.destroy();
     }
+  }
 
-    // Supprime un auteur par ID
-    public async deleteAuthor(id: number): Promise<void> {
-        const author = await Author.findByPk(id, authorService.includeBooksBookCopys);
-
-        if (author && author.books) {
-            const hasBookCopy = author.books.some(book =>
-                book.copys && book.copys.length > 0
-            );
-            if (hasBookCopy) {
-                let error: CustomError = new Error("Cannot delete author with existing book copies");
-                error.status = 400;
-                throw error;
-            }
-            await author.destroy();
-        }
+  public async updateAuthor(
+    id: number,
+    firstName?: string,
+    lastName?: string
+  ): Promise<Author | null> {
+    const author = await Author.findByPk(id);
+    if (author) {
+      if (firstName) author.firstName = firstName;
+      if (lastName) author.lastName = lastName;
+      await author.save();
+      return author;
     }
-
-    // Met à jour un auteur
-    public async updateAuthor(
-        id: number,
-        firstName?: string,
-        lastName?: string
-    ): Promise<Author | null> {
-        const author = await Author.findByPk(id);
-        if (author) {
-            if (firstName) author.firstName = firstName;
-            if (lastName) author.lastName = lastName;
-            await author.save();
-            return author;
-        }
-        return null;
-    }
+    return null;
+  }
 }
 
 export const authorService = new AuthorService();
